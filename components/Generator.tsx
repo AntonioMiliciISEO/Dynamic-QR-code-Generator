@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useRef } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 
@@ -13,19 +12,24 @@ export const Generator: React.FC = () => {
   const [id, setId] = useState(DEFAULT_ID);
 
   // Modification tracking for styling
-  // Default: Light Gray text (text-slate-400)
-  // Modified: White text (text-white)
   const [isBaseUrlModified, setIsBaseUrlModified] = useState(false);
   const [isCodeModified, setIsCodeModified] = useState(false);
   const [isIdModified, setIsIdModified] = useState(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  // Computed full URL using '#' for parameters
+  // Computed full URL using standard query parameters '?'
   const fullUrl = useMemo(() => {
-    const base = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-    // Constructing the URL with the hash fragment as requested
-    return `${base}#code=${encodeURIComponent(code)}&id=${encodeURIComponent(id)}`;
+    try {
+      const url = new URL(baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`);
+      url.searchParams.set('code', code);
+      url.searchParams.set('id', id);
+      return url.toString();
+    } catch (e) {
+      // Fallback in case of invalid URL base
+      const base = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+      return `${base}?code=${encodeURIComponent(code)}&id=${encodeURIComponent(id)}`;
+    }
   }, [baseUrl, code, id]);
 
   const handleDownload = () => {
@@ -44,21 +48,22 @@ export const Generator: React.FC = () => {
     alert('URL copied to clipboard!');
   };
 
-  const inputBaseClass = "w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-800 focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-400 outline-none transition-all font-medium placeholder:text-slate-600";
+  // Base class for inputs: white background to make dark text visible
+  const inputBaseClass = "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-medium placeholder:text-slate-300 shadow-sm";
 
   return (
-    <div className="w-full max-w-2xl bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden transition-all hover:shadow-2xl hover:shadow-indigo-100/50">
+    <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden transition-all">
       {/* Input Section */}
       <div className="p-6 sm:p-10 border-b border-slate-50">
         <h2 className="text-lg font-semibold text-slate-800 mb-6 flex items-center gap-2">
-          <i className="fa-solid fa-sliders text-indigo-500"></i>
-          Configuration
+          <i className="fa-solid fa-gear text-indigo-500"></i>
+          Configurazione Parametri
         </h2>
         
         <div className="space-y-6">
           {/* Base URL Input */}
           <div className="group">
-            <label className="block text-sm font-medium text-slate-500 mb-2 transition-colors group-focus-within:text-indigo-600">
+            <label className="block text-sm font-bold text-slate-600 mb-2 transition-colors group-focus-within:text-indigo-600">
               Base URL
             </label>
             <div className="relative">
@@ -70,11 +75,11 @@ export const Generator: React.FC = () => {
                   setIsBaseUrlModified(true);
                 }}
                 className={`${inputBaseClass} ${
-                  isBaseUrlModified ? 'text-white' : 'text-slate-400'
+                  isBaseUrlModified ? 'text-slate-800' : 'text-slate-400'
                 }`}
-                placeholder="Enter base URL..."
+                placeholder="Inserisci URL base..."
               />
-              <div className="absolute right-4 top-3.5 text-slate-500 group-focus-within:text-indigo-400">
+              <div className="absolute right-4 top-3.5 text-slate-300 group-focus-within:text-indigo-400 transition-colors">
                 <i className="fa-solid fa-link"></i>
               </div>
             </div>
@@ -83,7 +88,7 @@ export const Generator: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {/* Code Input */}
             <div className="group">
-              <label className="block text-sm font-medium text-slate-500 mb-2 transition-colors group-focus-within:text-indigo-600">
+              <label className="block text-sm font-bold text-slate-600 mb-2 transition-colors group-focus-within:text-indigo-600">
                 Code
               </label>
               <input
@@ -94,15 +99,15 @@ export const Generator: React.FC = () => {
                   setIsCodeModified(true);
                 }}
                 className={`${inputBaseClass} ${
-                  isCodeModified ? 'text-white' : 'text-slate-400'
+                  isCodeModified ? 'text-slate-800' : 'text-slate-400'
                 }`}
-                placeholder="Enter code..."
+                placeholder="Inserisci code..."
               />
             </div>
 
             {/* ID Input */}
             <div className="group">
-              <label className="block text-sm font-medium text-slate-500 mb-2 transition-colors group-focus-within:text-indigo-600">
+              <label className="block text-sm font-bold text-slate-600 mb-2 transition-colors group-focus-within:text-indigo-600">
                 ID
               </label>
               <input
@@ -113,9 +118,9 @@ export const Generator: React.FC = () => {
                   setIsIdModified(true);
                 }}
                 className={`${inputBaseClass} ${
-                  isIdModified ? 'text-white' : 'text-slate-400'
+                  isIdModified ? 'text-slate-800' : 'text-slate-400'
                 }`}
-                placeholder="Enter ID..."
+                placeholder="Inserisci ID..."
               />
             </div>
           </div>
@@ -125,62 +130,60 @@ export const Generator: React.FC = () => {
       {/* QR Code Output Section */}
       <div className="p-6 sm:p-10 bg-slate-50/50 flex flex-col items-center">
         <h2 className="text-lg font-semibold text-slate-800 mb-6 self-start flex items-center gap-2">
-          <i className="fa-solid fa-eye text-indigo-500"></i>
-          Generated Output
+          <i className="fa-solid fa-qrcode text-indigo-500"></i>
+          QR Code Generato
         </h2>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 mb-6 group cursor-pointer relative" onClick={handleDownload}>
+        <div 
+          className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 mb-8 group cursor-pointer relative hover:scale-105 transition-transform" 
+          onClick={handleDownload}
+          title="Clicca per scaricare"
+        >
           <div ref={canvasRef} className="relative z-10">
             <QRCodeCanvas 
               value={fullUrl} 
-              size={200}
+              size={240}
               level="H"
               includeMargin={true}
-              imageSettings={{
-                src: "https://picsum.photos/40/40",
-                x: undefined,
-                y: undefined,
-                height: 40,
-                width: 40,
-                excavate: true,
-              }}
             />
           </div>
           <div className="absolute inset-0 bg-indigo-600/0 group-hover:bg-indigo-600/5 transition-colors rounded-2xl flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <div className="bg-white px-4 py-2 rounded-full shadow-lg text-xs font-bold text-indigo-600 flex items-center gap-2">
+            <div className="bg-white px-4 py-2 rounded-full shadow-xl text-xs font-bold text-indigo-600 flex items-center gap-2">
               <i className="fa-solid fa-download"></i>
-              Download PNG
+              SCARICA PNG
             </div>
           </div>
         </div>
 
         {/* URL Preview Card */}
-        <div className="w-full bg-white p-4 rounded-xl border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="w-full overflow-hidden text-ellipsis whitespace-nowrap">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-tighter block">Encoded URL (with Fragment)</span>
-            <span className="text-sm font-mono text-indigo-600 truncate block">
+        <div className="w-full bg-white p-5 rounded-xl border border-slate-200 flex flex-col items-center gap-4">
+          <div className="w-full text-center overflow-hidden">
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">URL COMPLETO</span>
+            <span className="text-sm font-mono text-indigo-600 break-all bg-slate-50 p-2 rounded block">
               {fullUrl}
             </span>
           </div>
-          <button 
-            onClick={handleCopy}
-            className="w-full sm:w-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
-          >
-            <i className="fa-solid fa-copy"></i>
-            Copy URL
-          </button>
+          <div className="flex flex-col sm:flex-row gap-3 w-full">
+            <button 
+              onClick={handleCopy}
+              className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-bold transition-colors flex items-center justify-center gap-2"
+            >
+              <i className="fa-solid fa-copy"></i>
+              Copia Link
+            </button>
+            <button 
+              onClick={handleDownload}
+              className="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold transition-all shadow-lg shadow-indigo-100 flex items-center justify-center gap-2"
+            >
+              <i className="fa-solid fa-file-arrow-down"></i>
+              Salva Immagine
+            </button>
+          </div>
         </div>
-
-        <button 
-          onClick={handleDownload}
-          className="mt-8 w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-100 hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-3"
-        >
-          <i className="fa-solid fa-download"></i>
-          Export QR Code
-        </button>
         
-        <p className="mt-4 text-xs text-slate-400 text-center">
-            The QR code updates in real-time. Parameters are passed via URL fragment (#).
+        <p className="mt-6 text-xs text-slate-400 font-medium">
+            <i className="fa-solid fa-circle-info mr-1"></i>
+            Il QR code si aggiorna istantaneamente ad ogni modifica.
         </p>
       </div>
     </div>

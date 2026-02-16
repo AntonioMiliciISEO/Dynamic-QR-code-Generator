@@ -131,7 +131,7 @@ export const Generator: React.FC = () => {
       <div className="p-6 sm:p-10 bg-slate-50/50 flex flex-col items-center">
         <h2 className="text-lg font-semibold text-slate-800 mb-6 self-start flex items-center gap-2">
           <i className="fa-solid fa-qrcode text-indigo-500"></i>
-          QR Code Generato
+          QR Code Generator
         </h2>
 
         <div 

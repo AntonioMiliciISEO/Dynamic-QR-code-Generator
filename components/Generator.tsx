@@ -18,18 +18,11 @@ export const Generator: React.FC = () => {
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
-  // Computed full URL using standard query parameters '?'
+  // Computed full URL using fragment identifier '#' instead of query parameters '?'
   const fullUrl = useMemo(() => {
-    try {
-      const url = new URL(baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`);
-      url.searchParams.set('code', code);
-      url.searchParams.set('id', id);
-      return url.toString();
-    } catch (e) {
-      // Fallback in case of invalid URL base
-      const base = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-      return `${base}?code=${encodeURIComponent(code)}&id=${encodeURIComponent(id)}`;
-    }
+    const base = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+    // Costruisce l'URL usando '#' per passare i parametri
+    return `${base}#code=${encodeURIComponent(code)}&id=${encodeURIComponent(id)}`;
   }, [baseUrl, code, id]);
 
   const handleDownload = () => {
@@ -45,10 +38,10 @@ export const Generator: React.FC = () => {
 
   const handleCopy = () => {
     navigator.clipboard.writeText(fullUrl);
-    alert('URL copied to clipboard!');
+    alert('URL copiato negli appunti!');
   };
 
-  // Base class for inputs: white background to make dark text visible
+  // Base class for inputs
   const inputBaseClass = "w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all font-medium placeholder:text-slate-300 shadow-sm";
 
   return (
@@ -158,7 +151,7 @@ export const Generator: React.FC = () => {
         {/* URL Preview Card */}
         <div className="w-full bg-white p-5 rounded-xl border border-slate-200 flex flex-col items-center gap-4">
           <div className="w-full text-center overflow-hidden">
-            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">URL COMPLETO</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">URL COMPLETO (HASH PARAMS)</span>
             <span className="text-sm font-mono text-indigo-600 break-all bg-slate-50 p-2 rounded block">
               {fullUrl}
             </span>
@@ -181,9 +174,9 @@ export const Generator: React.FC = () => {
           </div>
         </div>
         
-        <p className="mt-6 text-xs text-slate-400 font-medium">
-            <i className="fa-solid fa-circle-info mr-1"></i>
-            Il QR code si aggiorna istantaneamente ad ogni modifica.
+        <p className="mt-6 text-xs text-slate-400 font-medium text-center">
+            <i className="fa-solid fa-circle-info mr-1 text-indigo-400"></i>
+            Nota: I parametri sono ora separati da '#' per il routing client-side.
         </p>
       </div>
     </div>

@@ -1,0 +1,5 @@
+{
+  "name": "Dynamic QR Key Generator",
+  "description": "A professional tool to generate dynamic QR codes for key cards by combining a base URL with specific code and ID parameters.",
+  "requestFramePermissions": []
+}

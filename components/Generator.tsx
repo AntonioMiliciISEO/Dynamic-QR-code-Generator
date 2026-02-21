@@ -4,17 +4,20 @@ import { QRCodeCanvas } from 'qrcode.react';
 const DEFAULT_BASE_URL = "https://dynamic-key-card-page.vercel.app/";
 const DEFAULT_CODE = "12345678";
 const DEFAULT_ID = "2";
+const DEFAULT_OPTIONS = "0";
 
 export const Generator: React.FC = () => {
   // Input values
   const [baseUrl, setBaseUrl] = useState(DEFAULT_BASE_URL);
   const [code, setCode] = useState(DEFAULT_CODE);
   const [id, setId] = useState(DEFAULT_ID);
+  const [options, setOptions] = useState(DEFAULT_OPTIONS);
 
   // Modification tracking for styling
   const [isBaseUrlModified, setIsBaseUrlModified] = useState(false);
   const [isCodeModified, setIsCodeModified] = useState(false);
   const [isIdModified, setIsIdModified] = useState(false);
+  const [isOptionsModified, setIsOptionsModified] = useState(false);
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -22,8 +25,8 @@ export const Generator: React.FC = () => {
   const fullUrl = useMemo(() => {
     const base = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
     // Costruisce l'URL usando '#' per passare i parametri
-    return `${base}#code=${encodeURIComponent(code)}&id=${encodeURIComponent(id)}`;
-  }, [baseUrl, code, id]);
+    return `${base}#code=${encodeURIComponent(code)}&id=${encodeURIComponent(id)}&options=${encodeURIComponent(options)}`;
+  }, [baseUrl, code, id, options]);
 
   const handleDownload = () => {
     const canvas = document.querySelector('canvas');
@@ -114,6 +117,31 @@ export const Generator: React.FC = () => {
                   isIdModified ? 'text-slate-800' : 'text-slate-400'
                 }`}
                 placeholder="Inserisci ID..."
+              />
+            </div>
+
+            {/* Options Input */}
+            <div className="group sm:col-span-2">
+              <label className="block text-sm font-bold text-slate-600 mb-2 transition-colors group-focus-within:text-indigo-600">
+                Options (Integer ≥ 0)
+              </label>
+              <input
+                type="number"
+                min="0"
+                step="1"
+                value={options}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  // Ensure it's non-negative and integer-like in string form
+                  if (val === "" || parseInt(val) >= 0) {
+                    setOptions(val);
+                    setIsOptionsModified(true);
+                  }
+                }}
+                className={`${inputBaseClass} ${
+                  isOptionsModified ? 'text-slate-800' : 'text-slate-400'
+                }`}
+                placeholder="Inserisci opzioni..."
               />
             </div>
           </div>

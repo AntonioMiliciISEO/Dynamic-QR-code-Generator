@@ -123,7 +123,7 @@ export const Generator: React.FC = () => {
             {/* Options Input */}
             <div className="group sm:col-span-2">
               <label className="block text-sm font-bold text-slate-600 mb-2 transition-colors group-focus-within:text-indigo-600">
-                Options (Integer ≥ 0)
+                Options
               </label>
               <input
                 type="number"
